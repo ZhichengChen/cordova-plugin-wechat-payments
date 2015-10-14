@@ -8,7 +8,7 @@ Send WeChat payment request, only test the android version right now.
 
 # Install
 
-`cordova plugin add https://github.com/ZhichengChen/cordova-plugin-weixin`
+`cordova plugin add https://github.com/ZhichengChen/cordova-plugin-wechat-payments`
 
 # Requirements
 
