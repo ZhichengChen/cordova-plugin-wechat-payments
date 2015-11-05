@@ -16,11 +16,11 @@ import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
-	
+
 	private static final String TAG = "Weixin";
-	
+
     private IWXAPI api;
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +49,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler{
 				intent = new Intent(this, WXPayEntryActivity.class.getClassLoader().loadClass(Constants.PACKNAME+ "."+ Constants.ACTIVITYCLASSNAME));
 				Bundle bundle=new Bundle();
 				bundle.putInt("weixinPayRespCode",  resp.errCode);
-				bundle.putString("intentType", "com.justep.cordova.plugin.weixin.Weixin");
+				bundle.putString("intentType", "com.justep.cordova.plugin.weixin.WeixinV3");
 			    intent.putExtras(bundle);
 			    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			    Log.i(TAG, "startActivity");

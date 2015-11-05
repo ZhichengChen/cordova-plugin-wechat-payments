@@ -36,6 +36,7 @@ import android.util.Log;
 import android.util.Xml;
 import android.widget.Toast;
 
+import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.sdk.modelmsg.WXTextObject;
@@ -69,17 +70,17 @@ public class WeixinV3 extends CordovaPlugin{
 	public static final int TYPE_WX_SHARING_VIDEO = 6;
 	public static final int TYPE_WX_SHARING_WEBPAGE = 7;
 	public static final int TYPE_WX_SHARING_TEXT = 8;
-	
+
 	protected IWXAPI api;
-	
+
 	protected static CallbackContext currentCallbackContext;
-	
+
 	private static String app_id;
-	
+
 	private static String partner_id;
 	private static String api_key;
 	private HashMap<String,PayOrder> payOrderList = new HashMap<String,PayOrder>();
-	
+
 	@Override
 	public boolean execute(String action, JSONArray args,
 			CallbackContext callbackContext) throws JSONException {
@@ -97,12 +98,39 @@ public class WeixinV3 extends CordovaPlugin{
 			return generatePrepayId(args);
 		}else if(action.equals("sendPayReq")){
 			return sendPayReq(args);
-		}
+		}else if (action.equals("sendAuthRequest")) {
+      return sendAuthRequest(args, callbackContext);
+    }
 		return false;
 	}
-	
-	
-	
+
+	protected boolean sendAuthRequest(JSONArray args, CallbackContext callbackContext) {
+
+      int length = args.length();
+      final SendAuth.Req req = new SendAuth.Req();
+      try {
+          if (length == 1) {
+              req.scope = args.getString(0);
+          } else if (length == 2) {
+              req.scope = args.getString(0);
+              req.state = args.getString(1);
+          } else {
+              req.scope = "snsapi_userinfo";
+              req.state = "wechat";
+          }
+      } catch (Exception e) {
+          req.scope = "snsapi_userinfo";
+          req.state = "wechat";
+
+          Log.e(TAG, e.getMessage());
+      }
+
+      api.sendReq(req);
+      currentCallbackContext = callbackContext;
+
+      return true;
+  }
+
 	private boolean generatePrepayId(JSONArray args){
 		//pay
 		try {
@@ -115,7 +143,7 @@ public class WeixinV3 extends CordovaPlugin{
 		}
 		return true;
 	}
-	
+
 	protected boolean sendPayReq(JSONArray args){
 		Log.i(TAG, "pay begin");
 		try {
@@ -224,7 +252,7 @@ public class WeixinV3 extends CordovaPlugin{
 
 		case TYPE_WX_SHARING_VIDEO:
 			break;
-			
+
 		case TYPE_WX_SHARING_TEXT:
 			mediaObject = new WXTextObject();
 			((WXTextObject)mediaObject).text = media.getString(KEY_ARG_MESSAGE_MEDIA_TEXT);
@@ -239,8 +267,8 @@ public class WeixinV3 extends CordovaPlugin{
 		wxMediaMessage.mediaObject = mediaObject;
 		return wxMediaMessage;
 	}
-	
-	
+
+
 	private String genProductArgs(JSONObject args) {
 		try {
 			String	nonceStr = genNonceStr();
@@ -264,7 +292,7 @@ public class WeixinV3 extends CordovaPlugin{
 			return null;
 		}
 	}
-	
+
 	private String toXml(List<NameValuePair> params) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<xml>");
@@ -280,12 +308,12 @@ public class WeixinV3 extends CordovaPlugin{
 		Log.e("orion",sb.toString());
 		return sb.toString();
 	}
-	
-	
-	
+
+
+
 	private class GetPrepayIdTask extends AsyncTask<Void, Void, Map<String,String>> {
 		String packageParams;
-		
+
 		public GetPrepayIdTask(String packageParams) {
 			this.packageParams = packageParams;
 		}
@@ -300,7 +328,7 @@ public class WeixinV3 extends CordovaPlugin{
 				currentCallbackContext.error(result.get("return_code"));
 			}
 		}
-		
+
 		@Override
 		protected void onPreExecute() {
 			Log.i(TAG, "正在获取订单id");
@@ -320,7 +348,7 @@ public class WeixinV3 extends CordovaPlugin{
 			return xml;
 		}
 	}
-	
+
 	public Map<String,String> decodeXml(String content) {
 		try {
 			Map<String, String> xml = new HashMap<String, String>();
@@ -354,19 +382,19 @@ public class WeixinV3 extends CordovaPlugin{
 		return null;
 
 	}
-	
+
 	private String genNonceStr() {
 		Random random = new Random();
 		return MD5.getMessageDigest(String.valueOf(random.nextInt(10000)).getBytes());
 	}
-	
+
 	private long genTimeStamp() {
 		return System.currentTimeMillis() / 1000;
 	}
-	
+
 	private String genPackageSign(List<NameValuePair> params) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		for (int i = 0; i < params.size(); i++) {
 			sb.append(params.get(i).getName());
 			sb.append('=');
@@ -375,12 +403,12 @@ public class WeixinV3 extends CordovaPlugin{
 		}
 		sb.append("key=");
 		sb.append(api_key);
-		
+
 		String packageSign = MD5.getMessageDigest(sb.toString().getBytes(Charset.forName("utf-8"))).toUpperCase();
-		
+
 		return packageSign;
 	}
-	
+
 	private String genAppSign(List<NameValuePair> params) {
 		StringBuilder sb = new StringBuilder();
 
@@ -392,11 +420,11 @@ public class WeixinV3 extends CordovaPlugin{
 		}
 		sb.append("key=");
 		sb.append(api_key);
-        
+
 		String appSign = MD5.getMessageDigest(sb.toString().getBytes()).toUpperCase();
 		return appSign;
 	}
-	
+
 	private PayReq genPayReq(String prepay_id) {
 		PayReq req = new PayReq();
 		req.appId = app_id;
@@ -420,7 +448,7 @@ public class WeixinV3 extends CordovaPlugin{
 	}
 	private void sendPayReq(String prepayId) {
 		api.registerApp(app_id);
-		
+
 		final PayReq req = genPayReq(prepayId);
 		cordova.getThreadPool().execute(new Runnable() {
 			@Override
@@ -432,8 +460,8 @@ public class WeixinV3 extends CordovaPlugin{
 			}
 		});
 	}
-	
-	
+
+
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -444,19 +472,19 @@ public class WeixinV3 extends CordovaPlugin{
 		getWXAPI();
 		this.onWeixinResp(cordova.getActivity().getIntent());
 	}
-	
+
 	private void onWeixinResp(Intent intent) {
 		Bundle extras =  intent.getExtras();
 		if(extras!=null){
 			String intentType = extras.getString("intentType");
-			if("com.justep.cordova.plugin.weixin.Weixin".equals(intentType)){
+			if("com.justep.cordova.plugin.weixin.WeixinV3".equals(intentType)){
 				if(currentCallbackContext != null){
 					currentCallbackContext.success(extras.getInt("weixinPayRespCode"));
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);

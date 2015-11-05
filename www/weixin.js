@@ -17,7 +17,7 @@
          },function(message){
             alert("getPrepayId:" + message);
          });
-	
+
 	weixin.share({
 	      message: {
 	         title: "Message Title",
@@ -35,7 +35,11 @@
 	  }, function (reason) {
 	      alert("Failed: " + reason);
 	  });
-	
+
+
+
+	weixin.auth(function (response) { alert(response.code); });
+
 **/
 var exec = require('cordova/exec');
 
@@ -89,5 +93,20 @@ module.exports = {
     },
     sendPayReq: function(prepayId,onSuccess,onError){
         exec(onSuccess, onError, "Weixin", "sendPayReq", [{"prepayId":prepayId}]);
-    }
+    },
+    auth: function (scope, state, onSuccess, onError) {
+        if (typeof scope == "function") {
+            // weixin.auth(function () { alert("Success"); });
+            // weixin.auth(function () { alert("Success"); }, function (error) { alert(error); });
+            return exec(scope, state, "Weixin", "sendAuthRequest");
+        }
+
+        if (typeof state == "function") {
+            // weixin.auth("snsapi_userinfo", function () { alert("Success"); });
+            // weixin.auth("snsapi_userinfo", function () { alert("Success"); }, function (error) { alert(error); });
+            return exec(state, onSuccess, "Weixin", "sendAuthRequest", [scope]);
+        }
+
+        return exec(onSuccess, onError, "Weixin", "sendAuthRequest", [scope, state]);
+    },
 };
