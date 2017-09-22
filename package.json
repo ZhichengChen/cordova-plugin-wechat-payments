@@ -1,0 +1,38 @@
+{
+  "name": "cordova-plugin-wechat-payments",
+  "version": "1.0.0",
+  "description": "Cordova Wechat Payments Plugin",
+  "types": "",
+  "cordova": {
+    "id": "cordova-plugin-wechat-payments",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZhichengChen/cordova-plugin-wechat-payments"
+  },
+  "bugs": {
+    "url": "https://github.com/ZhichengChen/cordova-plugin-wechat-payments/issues"
+  },
+  "keywords": [
+    "cordova",
+    "wechat",
+    "payments",
+    "cordova-android"
+  ],
+  "scripts": {
+  },
+  "author": "ZhichengChen",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "2.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "devDependencies": {
+  }
+}
