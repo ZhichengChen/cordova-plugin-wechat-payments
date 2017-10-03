@@ -1,3 +1,5 @@
+[中文](README.md)
+
 # cordova-plugin-wechat-payments
 
 Wexin payments plugin import from http://wex5.com/
@@ -22,13 +24,13 @@ Send WeChat payment request, only test the android version right now.
 
 5. Your will received the [WeCaht Merchant Platform](https://pay.weixin.qq.com) account by email after the apply approved, follow the instraction in the email finish your authentication;
 
-6. Fill the api key with your application sign, and remeber your **merchat id**;
+6. In [this page](https://pay.weixin.qq.com/index.php/core/cert/api_cert), click `Setting PassPhrase` button, then fill the api key with 32 bit passphrase, remeber your **merchat id** and **api key**;
 
 # Usage
 
 1. Open the `plugins/android.json`, change the $weixin_api_key to your *AppID*;
 
-2. Open the `src/android/com/justep/base/Constants.java`, fill the PACKNAME, ACTIVITYCLASSNAME, APPNAME with proper value, and fill the APPID, PARTNERID, APIKEY with *AppId*, *merchat id*, *application sign*;
+2. Open the `src/android/com/justep/base/Constants.java`, fill the PACKNAME, ACTIVITYCLASSNAME, APPNAME with proper value, and fill the APPID, PARTNERID, APIKEY with *AppId*, *merchat id*, *api key*;
 
 3. Js code
 
